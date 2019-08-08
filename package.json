@@ -1,0 +1,26 @@
+{
+    "name": "streamlabs-scene-switcher",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "streamlabs",
+        "scene",
+        "switcher"
+    ],
+    "author": "stuyk",
+    "license": "ISC",
+    "dependencies": {
+        "active-win": "^5.1.2",
+        "iohook": "^0.6.1",
+        "load-json-file": "^6.2.0",
+        "sockjs-client": "^1.3.0"
+    },
+    "prettier": {
+        "tabWidth": 4,
+        "singleQuote": true
+    }
+}

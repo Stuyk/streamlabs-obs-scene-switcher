@@ -1,0 +1,10 @@
+[
+    {
+        "windowIncludes": "alt:V",
+        "sceneSelect": "GTAScene"
+    },
+    {
+        "windowIncludes": "Visual Studio Code",
+        "sceneSelect": "CodeScene"
+    }
+]
