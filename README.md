@@ -31,8 +31,10 @@ Keep the console window open while streaming.
 Basic idea behind this. It looks for partial window titles.
 Use Streamlabs OBS window picker thing to pick windows and see some of their titles. Base it on that. Never do the full window title. Only partial.
 
+```
 windowIncludes = WindowTitle
 sceneSelect = FULL name of the scene in StreamLabs
+```
 
 You can add as many scenes and windows as you want.
 
