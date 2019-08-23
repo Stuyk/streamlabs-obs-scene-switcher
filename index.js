@@ -4,6 +4,7 @@ const iohook = require('iohook');
 const loadJsonFile = require('load-json-file');
 const sock = new SockJS('http://127.0.0.1:59650/api');
 const pendingTransactions = [];
+const exec = require('child_process').exec;
 
 var currWindow = undefined;
 
@@ -65,17 +66,58 @@ function sendSceneRequest(nameOfScene) {
 iohook.on('mouseclick', e => {
     activeWin()
         .then(res => {
-            var windowFound = binds.find(x =>
-                res.title.includes(x.windowIncludes)
+            var windowFoundExe = binds.find(x =>
+                res.owner.name
+                    .toLowerCase()
+                    .includes(x.windowIncludes.toLowerCase())
             );
 
-            if (windowFound === undefined) return;
+            var windowFound = binds.find(x =>
+                res.title.toLowerCase().includes(x.windowIncludes.toLowerCase())
+            );
+
+            if (windowFound === undefined && windowFoundExe === undefined)
+                return;
 
             if (currWindow === res.id) return;
 
-            console.log(`Attempting transition to: ${windowFound.sceneSelect}`);
+            console.log(res.id);
             currWindow = res.id;
-            sendSceneRequest(windowFound.sceneSelect);
+
+            if (windowFound !== undefined) {
+                console.log(
+                    `Attempting transition to: ${windowFound.sceneSelect}`
+                );
+                sendSceneRequest(windowFound.sceneSelect);
+
+                if (windowFound.audio) {
+                    exec(
+                        `sounds\\mediarunner.bat sounds\\${windowFound.audio}`,
+                        (err, stdout, stderr) => {
+                            console.log(stderr);
+                        }
+                    );
+                }
+            }
+
+            if (windowFoundExe !== undefined) {
+                console.log(
+                    `Attempting transition to: ${windowFoundExe.sceneSelect}`
+                );
+                sendSceneRequest(windowFoundExe.sceneSelect);
+
+                if (windowFound.audio) {
+                    console.log('Playing sound...');
+                    sound.once('load', () => {
+                        exec(
+                            `sounds\\mediarunner.bat sounds\\${windowFound.audio}`,
+                            (err, stdout, stderr) => {
+                                console.log(stderr);
+                            }
+                        );
+                    });
+                }
+            }
         })
         .catch(() => {});
 });

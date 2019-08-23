@@ -1,10 +1,22 @@
 [
     {
         "windowIncludes": "alt:V",
-        "sceneSelect": "GTAScene"
+        "sceneSelect": "GTAScene",
+        "audio": "whoosh.wav"
     },
     {
         "windowIncludes": "Visual Studio Code",
-        "sceneSelect": "CodeScene"
+        "sceneSelect": "CodeScene",
+        "audio": "whoosh.wav"
+    },
+    {
+        "windowIncludes": "Brave",
+        "sceneSelect": "BrowserView",
+        "audio": "whoosh.wav"
+    },
+    {
+        "windowIncludes": "Photoshop",
+        "sceneSelect": "TabletScene",
+        "audio": "whoosh.wav"
     }
 ]
