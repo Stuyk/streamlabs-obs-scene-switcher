@@ -26,6 +26,11 @@ Run the app by running the `run.bat` or run `node index.js` in a console window.
 
 Keep the console window open while streaming.
 
+Open up Streamlabs OBS; go to your settings and navigate to remote control.
+Click on 'show' to display the QR Code. After; you can stream normally.
+
+Scene switching should work normally.
+
 ### Configuration
 
 Basic idea behind this. It looks for partial window titles.

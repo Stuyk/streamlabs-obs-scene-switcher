@@ -1,20 +1,16 @@
 const activeWin = require('active-win');
+const fs = require('fs');
 const SockJS = require('sockjs-client');
-const iohook = require('iohook');
-const loadJsonFile = require('load-json-file');
+const binds = JSON.parse(fs.readFileSync(`${__dirname}/config.json`));
 const sock = new SockJS('http://127.0.0.1:59650/api');
 const pendingTransactions = [];
-const exec = require('child_process').exec;
 
-var currWindow = undefined;
-
-var binds = loadJsonFile.sync('./config.json');
+var currWindow;
 
 sock.onopen = () => {
-    console.log('===> Connected');
+    console.log('===> Connected Successfully to Streamlabs');
 };
 
-// Socket Recieve Events
 sock.onmessage = e => {
     // Remove pending transaction.
     if (pendingTransactions.length <= 0) return;
@@ -25,15 +21,15 @@ sock.onmessage = e => {
 
     if (transactionType.type === 'sceneRequest') {
         if (response.result[0].name === undefined) {
+            console.log('Was unable to parse a result.');
             return;
         }
 
-        var foundScene = response.result.find(
-            x => x.name === transactionType.sceneName
-        );
+        var foundScene = response.result.find(x => x.name === transactionType.sceneName);
 
         if (foundScene === undefined) return;
 
+        console.log(`Transition to Scene: ${transactionType.sceneName}`);
         sock.send(
             JSON.stringify({
                 jsonrpc: '2.0',
@@ -63,63 +59,28 @@ function sendSceneRequest(nameOfScene) {
     );
 }
 
-iohook.on('mouseclick', e => {
-    activeWin()
-        .then(res => {
-            var windowFoundExe = binds.find(x =>
-                res.owner.name
-                    .toLowerCase()
-                    .includes(x.windowIncludes.toLowerCase())
-            );
+setInterval(async () => {
+    const res = await activeWin();
 
-            var windowFound = binds.find(x =>
-                res.title.toLowerCase().includes(x.windowIncludes.toLowerCase())
-            );
+    var windowFoundExe = binds.data.find(x => {
+        if (res && res.owner.name.toLowerCase().includes(x.windowIncludes.toLowerCase())) return x;
+    });
 
-            if (windowFound === undefined && windowFoundExe === undefined)
-                return;
+    var windowFound = binds.data.find(x => {
+        if (res && res.title.toLowerCase().includes(x.windowIncludes.toLowerCase())) return x;
+    });
 
-            if (currWindow === res.id) return;
+    if (windowFound === undefined && windowFoundExe === undefined) return;
 
-            console.log(res.id);
-            currWindow = res.id;
+    if (currWindow === res.id) return;
 
-            if (windowFound !== undefined) {
-                console.log(
-                    `Attempting transition to: ${windowFound.sceneSelect}`
-                );
-                sendSceneRequest(windowFound.sceneSelect);
+    currWindow = res.id;
 
-                if (windowFound.audio) {
-                    exec(
-                        `sounds\\mediarunner.bat sounds\\${windowFound.audio}`,
-                        (err, stdout, stderr) => {
-                            console.log(stderr);
-                        }
-                    );
-                }
-            }
+    if (windowFound !== undefined) {
+        sendSceneRequest(windowFound.sceneSelect);
+    }
 
-            if (windowFoundExe !== undefined) {
-                console.log(
-                    `Attempting transition to: ${windowFoundExe.sceneSelect}`
-                );
-                sendSceneRequest(windowFoundExe.sceneSelect);
-
-                if (windowFound.audio) {
-                    console.log('Playing sound...');
-                    sound.once('load', () => {
-                        exec(
-                            `sounds\\mediarunner.bat sounds\\${windowFound.audio}`,
-                            (err, stdout, stderr) => {
-                                console.log(stderr);
-                            }
-                        );
-                    });
-                }
-            }
-        })
-        .catch(() => {});
-});
-
-iohook.start();
+    if (windowFoundExe !== undefined) {
+        sendSceneRequest(windowFoundExe.sceneSelect);
+    }
+}, 500);
