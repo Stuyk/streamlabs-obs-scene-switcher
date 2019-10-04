@@ -6,7 +6,7 @@ Its not a plugin; but the scene switcher will detect which program you click on 
 
 ### Requirements
 
--   [NodeJS](https://nodejs.org/en/download/)
+-   [NodeJS v12+](https://nodejs.org/en/download/)
 -   [Python 2.7](https://www.python.org/downloads/release/python-2716/)
 -   [node-gyp]()
 
