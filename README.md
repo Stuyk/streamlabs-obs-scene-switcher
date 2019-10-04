@@ -2,7 +2,7 @@
 
 Its not a plugin; but the scene switcher will detect which program you click on then switch to the designated scene.
 
-[Check me out on Twitch](https://twitch.tv/stuykgaming/)
+[Check me out on Twitch](https://twitch.tv/stuyksoft/)
 
 ### Requirements
 
