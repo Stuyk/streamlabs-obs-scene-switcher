@@ -1,3 +1,5 @@
+console.log('Starting Scene Switcher');
+
 const activeWin = require('active-win');
 const fs = require('fs');
 const SockJS = require('sockjs-client');

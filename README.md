@@ -18,6 +18,12 @@ If you get errors with the requirements above; there's not much I can do. Node-g
 
 ### Installation
 
+#### I want this to be easy.
+
+Go to the releases tab at the top; and simply download it.
+
+#### I like lots of pain when I install things:
+
 Download the files in this repo.
 
 In a Powershell or CMD
