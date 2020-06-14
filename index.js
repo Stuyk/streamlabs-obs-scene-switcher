@@ -37,7 +37,6 @@ function readConfiguration() {
     }
 
     const configStats = fs.statSync(path.join(currentDirectory, 'config.json'));
-
     if (oldSize === configStats.size) {
         return;
     }
@@ -118,7 +117,6 @@ function checkCurrentWindow() {
     }
 
     const currentWindow = activeWindows.getActiveWindow();
-
     if (!currentWindow) {
         return;
     }

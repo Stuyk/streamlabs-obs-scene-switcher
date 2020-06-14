@@ -1,0 +1,14 @@
+{
+	"token": "slobs settings -> remote control -> click qr code -> show details -> copy api token",
+	"printWindowNames": false,
+	"scenes": [
+		{
+			"windowClassName": "Code.exe",
+			"targetScene": "CodeScene"
+		},
+		{
+			"windowClassName": "GTA5.exe",
+			"targetScene": "GTAScene"
+		}
+	]
+}

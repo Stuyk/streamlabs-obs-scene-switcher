@@ -1,3 +1,5 @@
+![](https://i.imgur.com/B6PuHLg.jpg)
+
 # Streamlabs OBS Scene Switcher
 
 Its not a plugin; but the scene switcher will detect which program you click on then switch to the designated scene.
