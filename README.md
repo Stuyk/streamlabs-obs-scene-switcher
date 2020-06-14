@@ -52,6 +52,8 @@ After you need to supply the `.exe` for the automatic scene switch.
 
 You can set the `printWindowNames` configuration option to true to see clicked windows.
 
+Your `targetScene` must correspond with the scene name in your streamlabs obs scenes.
+
 ```
 {
     "token": "slobs settings -> remote control -> click qr code -> show details -> copy api token",
