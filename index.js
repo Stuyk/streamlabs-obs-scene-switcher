@@ -32,6 +32,10 @@ let config = {
 };
 
 function readConfiguration() {
+    if (!fs.existsSync(path.join(currentDirectory, 'config.json'))) {
+        fs.writeFileSync(path.join(currentDirectory, `config.json`), JSON.stringify(config, null, '\t'));
+    }
+
     const configStats = fs.statSync(path.join(currentDirectory, 'config.json'));
 
     if (oldSize === configStats.size) {
@@ -39,14 +43,8 @@ function readConfiguration() {
     }
 
     oldSize = configStats.size;
-
-    printInfo(`Reading Configuration!`);
-    if (fs.existsSync(path.join(currentDirectory, `config.json`))) {
-        config = JSON.parse(fs.readFileSync(path.join(currentDirectory, `config.json`)).toString());
-    } else {
-        fs.writeFileSync(path.join(currentDirectory, `config.json`), JSON.stringify(config, null, '\t'));
-    }
-
+    config = JSON.parse(fs.readFileSync(path.join(currentDirectory, `config.json`)).toString());
+    printInfo('Configuration has been updated.');
     printInfo(`Current Scene Count: ${config.scenes.length}`);
 }
 
