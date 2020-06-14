@@ -1,54 +1,147 @@
-console.log('Starting Scene Switcher');
-
-const activeWin = require('active-win');
+const activeWindows = require('active-windows');
 const fs = require('fs');
+const path = require('path');
+const chalk = require('chalk');
 const SockJS = require('sockjs-client');
-const binds = JSON.parse(fs.readFileSync(`${__dirname}/config.json`));
+
+printInfo('Streamlabs Settings -> Remote Control -> Click the QR Code -> Restart this Client');
+printInfo('Attempting Socket Connection to Streamlabs...');
+
 const sock = new SockJS('http://127.0.0.1:59650/api');
-const pendingTransactions = [];
+const currentDirectory = process.cwd().replace(/\\/g, '/');
 
-var currWindow;
+let nextConfigRefreshTime = Date.now();
+let pendingTransactions = [];
+let lastWindow = '';
+let paused = false;
+let oldSize = 0;
 
-sock.onopen = () => {
-    console.log('===> Connected Successfully to Streamlabs');
+let config = {
+    token: 'slobs settings -> remote control -> click qr code -> show details -> copy api token',
+    printWindowNames: false,
+    scenes: [
+        {
+            windowClassName: 'Code.exe',
+            targetScene: `CodeScene`
+        },
+        {
+            windowClassName: 'GTA5.exe',
+            targetScene: `GTAScene`
+        }
+    ]
 };
 
-sock.onmessage = e => {
-    // Remove pending transaction.
-    if (pendingTransactions.length <= 0) return;
-    var transactionType = pendingTransactions.shift();
+function readConfiguration() {
+    const configStats = fs.statSync(path.join(currentDirectory, 'config.json'));
 
-    // Parse JSON Data
-    var response = JSON.parse(e.data);
-
-    if (transactionType.type === 'sceneRequest') {
-        if (response.result[0].name === undefined) {
-            console.log('Was unable to parse a result.');
-            return;
-        }
-
-        var foundScene = response.result.find(x => x.name === transactionType.sceneName);
-
-        if (foundScene === undefined) return;
-
-        console.log(`Transition to Scene: ${transactionType.sceneName}`);
-        sock.send(
-            JSON.stringify({
-                jsonrpc: '2.0',
-                id: 1,
-                method: 'makeSceneActive',
-                params: {
-                    resource: 'ScenesService',
-                    args: [foundScene.id]
-                }
-            })
-        );
+    if (oldSize === configStats.size) {
         return;
     }
+
+    oldSize = configStats.size;
+
+    printInfo(`Reading Configuration!`);
+    if (fs.existsSync(path.join(currentDirectory, `config.json`))) {
+        config = JSON.parse(fs.readFileSync(path.join(currentDirectory, `config.json`)).toString());
+    } else {
+        fs.writeFileSync(path.join(currentDirectory, `config.json`), JSON.stringify(config, null, '\t'));
+    }
+
+    printInfo(`Current Scene Count: ${config.scenes.length}`);
+}
+
+function printInfo(msg) {
+    console.log(chalk.blueBright(`[INFO] ${msg}`));
+}
+
+async function sendMessage(message) {
+    let requestBody = message;
+    if (typeof message === 'string') {
+        try {
+            requestBody = JSON.parse(message);
+        } catch (e) {
+            alert('Invalid JSON');
+            return;
+        }
+    }
+
+    sock.send(JSON.stringify(requestBody));
+}
+
+async function request(resourceId, methodName, ...args) {
+    let requestBody = {
+        jsonrpc: '2.0',
+        id: 2,
+        method: methodName,
+        params: { resource: resourceId, args }
+    };
+
+    await sendMessage(requestBody);
+}
+
+sock.onopen = async () => {
+    printInfo('Connected to Streamlabs Successfully!');
+    readConfiguration();
+
+    if (config.token.includes('slobs')) {
+        await new Promise((resolve) => {
+            printInfo(`Please Provide an API Token in your 'config.json.'`);
+            printInfo(config.token);
+
+            const interval = setInterval(() => {
+                readConfiguration();
+
+                if (config.token.includes('slobs')) {
+                    return;
+                }
+
+                clearInterval(interval);
+                resolve();
+            }, 2500);
+        });
+    }
+
+    await request('TcpServerService', 'auth', config.token);
+    setInterval(checkCurrentWindow, 200);
 };
 
-function sendSceneRequest(nameOfScene) {
-    pendingTransactions.push({ type: 'sceneRequest', sceneName: nameOfScene });
+function checkCurrentWindow() {
+    if (paused) {
+        return;
+    }
+
+    if (!config) {
+        return;
+    }
+
+    if (Date.now() > nextConfigRefreshTime) {
+        nextConfigRefreshTime = Date.now() + 5000;
+        readConfiguration();
+    }
+
+    const currentWindow = activeWindows.getActiveWindow();
+
+    if (!currentWindow) {
+        return;
+    }
+
+    if (config.printWindowNames) {
+        printInfo(`DEBUG WINDOW CLASS NAME: ${currentWindow.windowClass}`);
+    }
+
+    const configIndex = config.scenes.findIndex((option) => option.windowClassName === currentWindow.windowClass);
+
+    if (configIndex <= -1) {
+        return;
+    }
+
+    const sceneInfo = config.scenes[configIndex];
+    if (lastWindow === currentWindow.windowClass) {
+        return;
+    }
+
+    lastWindow = currentWindow.windowClass;
+    pendingTransactions.push({ type: 'sceneRequest', sceneName: sceneInfo.targetScene });
     sock.send(
         JSON.stringify({
             jsonrpc: '2.0',
@@ -61,28 +154,38 @@ function sendSceneRequest(nameOfScene) {
     );
 }
 
-setInterval(async () => {
-    const res = await activeWin();
-
-    var windowFoundExe = binds.data.find(x => {
-        if (res && res.owner.name.toLowerCase().includes(x.windowIncludes.toLowerCase())) return x;
-    });
-
-    var windowFound = binds.data.find(x => {
-        if (res && res.title.toLowerCase().includes(x.windowIncludes.toLowerCase())) return x;
-    });
-
-    if (windowFound === undefined && windowFoundExe === undefined) return;
-
-    if (currWindow === res.id) return;
-
-    currWindow = res.id;
-
-    if (windowFound !== undefined) {
-        sendSceneRequest(windowFound.sceneSelect);
+sock.onmessage = (e) => {
+    if (pendingTransactions.length <= 0) {
+        return;
     }
 
-    if (windowFoundExe !== undefined) {
-        sendSceneRequest(windowFoundExe.sceneSelect);
+    const transactionType = pendingTransactions.shift();
+    const response = JSON.parse(e.data);
+
+    if (transactionType.type !== 'sceneRequest') {
+        return;
     }
-}, 500);
+
+    if (response.result[0].name === undefined) {
+        printInfo(`Was Unable to Parse a Result`);
+        return;
+    }
+
+    const foundScene = response.result.find((x) => x.name === transactionType.sceneName);
+    if (foundScene === undefined) {
+        return;
+    }
+
+    printInfo(`Transition to Scene: ${transactionType.sceneName}`);
+    sock.send(
+        JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'makeSceneActive',
+            params: {
+                resource: 'ScenesService',
+                args: [foundScene.id]
+            }
+        })
+    );
+};

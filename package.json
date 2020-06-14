@@ -1,15 +1,25 @@
 {
     "name": "slobs-stream-switcher",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": "",
     "main": "./index.js",
     "scripts": {
-        "start": "node index.js"
+        "start": "node index.js",
+        "build": "npm install -g pkg && pkg ."
     },
-    "author": "",
+    "author": "stuyk",
     "license": "ISC",
     "dependencies": {
-        "active-win": "^5.1.3",
+        "active-windows": "^0.1.12",
+        "chalk": "^4.1.0",
         "sockjs-client": "^1.4.0"
-    }
+    },
+    "prettier": {
+        "semi": true,
+        "printWidth": 120,
+        "tabWidth": 4,
+        "singleQuote": true,
+        "trailingComma": "none"
+    },
+    "bin": "index.js"
 }

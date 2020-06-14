@@ -2,12 +2,14 @@
 
 Its not a plugin; but the scene switcher will detect which program you click on then switch to the designated scene.
 
+### IMPORTANT: Use NodeJS 14+
+
 [Check me out on Twitch](https://twitch.tv/stuyksoft/)
 [Preview of Switcher](https://clips.twitch.tv/LuckyInspiringMeerkatDeIlluminati)
 
 ### Requirements
 
--   [NodeJS v12+](https://nodejs.org/en/download/)
+-   [NodeJS v14+](https://nodejs.org/en/download/)
 -   [Python 2.7](https://www.python.org/downloads/release/python-2716/)
 -   [node-gyp]()
 
@@ -40,25 +42,37 @@ Scene switching should work normally.
 
 ### Configuration
 
-Basic idea behind this. It looks for partial window titles.
-Use Streamlabs OBS window picker thing to pick windows and see some of their titles. Base it on that. Never do the full window title. Only partial.
+The configuration file will automatically be generated and refreshed after you run the application.
+
+You will need to generate a token and supply it to the configuration.
+
+[Here is a gif on how to do that](https://gfycat.com/DisfiguredAmazingBighornsheep)
+
+After you need to supply the `.exe` for the automatic scene switch.
+
+You can set the `printWindowNames` configuration option to true to see clicked windows.
 
 ```
-windowIncludes = WindowTitle
-sceneSelect = FULL name of the scene in StreamLabs
-```
-
-You can add as many scenes and windows as you want.
-
-```
-[
-    {
-        "windowIncludes": "alt:V",
-        "sceneSelect": "GTAScene"
-    },
-    {
-        "windowIncludes": "Visual Studio Code",
-        "sceneSelect": "CodeScene"
-    }
-]
+{
+    "token": "slobs settings -> remote control -> click qr code -> show details -> copy api token",
+    "printWindowNames": false,
+    "scenes": [
+        {
+            "windowClassName": "Code.exe",
+            "targetScene": "CodeScene"
+        },
+        {
+            "windowClassName": "GTA5.exe",
+            "targetScene": "GTAScene"
+        },
+        {
+            "windowClassName": "brave.exe",
+            "targetScene": "BrowserView"
+        },
+        {
+            "windowClassName": "explorer.exe",
+            "targetScene": "DesktopView"
+        }
+    ]
+}
 ```

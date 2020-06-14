@@ -1,20 +1,22 @@
 {
-    "data": [
+    "token": "ca57fe559d1faac2911eb0ce207a825d98621e",
+    "printWindowNames": true,
+    "scenes": [
         {
-            "windowIncludes": "alt:V",
-            "sceneSelect": "GTAScene"
+            "windowClassName": "Code.exe",
+            "targetScene": "CodeScene"
         },
         {
-            "windowIncludes": "Visual Studio Code",
-            "sceneSelect": "CodeScene"
+            "windowClassName": "GTA5.exe",
+            "targetScene": "GTAScene"
         },
         {
-            "windowIncludes": "Brave",
-            "sceneSelect": "BrowserView"
+            "windowClassName": "brave.exe",
+            "targetScene": "BrowserView"
         },
         {
-            "windowIncludes": "Photoshop",
-            "sceneSelect": "TabletScene"
+            "windowClassName": "explorer.exe",
+            "targetScene": "DesktopView"
         }
     ]
 }
