@@ -2,6 +2,16 @@
 
 # Streamlabs OBS Scene Switcher
 
+Created by Stuyk (Trevor Wessel)
+
+❤️ Please support my open source work by donating. I'm here to provide general context for complicated procedures for you new developers. ❤️
+
+https://github.com/sponsors/Stuyk/
+
+⭐ This repository if you found it useful!
+
+---
+
 Its not a plugin; but the scene switcher will detect which program you click on then switch to the designated scene.
 
 ### IMPORTANT: Use NodeJS 14+
