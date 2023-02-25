@@ -12,7 +12,7 @@ const currentDirectory = process.cwd().replace(/\\/g, '/');
 
 let nextConfigRefreshTime = Date.now();
 let pendingTransactions = [];
-let lastWindow = '';
+let lastSceneIndex = -1;
 let paused = false;
 let oldSize = 0;
 
@@ -22,6 +22,7 @@ let config = {
     scenes: [
         {
             windowClassName: 'Code.exe',
+            windowName: { name: "Project Name", contains: true },
             targetScene: `CodeScene`
         },
         {
@@ -122,21 +123,37 @@ function checkCurrentWindow() {
     }
 
     if (config.printWindowNames) {
+        printInfo(`DEBUG WINDOW NAME: ${currentWindow.windowName}`);
         printInfo(`DEBUG WINDOW CLASS NAME: ${currentWindow.windowClass}`);
     }
 
-    const configIndex = config.scenes.findIndex((option) => option.windowClassName === currentWindow.windowClass);
+    var comparator = (option) => {
+        var result = option.windowClassName === currentWindow.windowClass;
+        if (result && option.windowName !== undefined) {
+            if (typeof option.windowName === "string")
+                result = currentWindow.windowName === option.windowName;
+            else {
+                var windowName = option.windowName.name
+                result = option.windowName.contains
+                    ? currentWindow.windowName.includes(windowName) 
+                    : currentWindow.windowName === windowName
+            }
+        }
+        return result;
+    }
+
+    const configIndex = config.scenes.findIndex(comparator);
 
     if (configIndex <= -1) {
         return;
     }
 
     const sceneInfo = config.scenes[configIndex];
-    if (lastWindow === currentWindow.windowClass) {
+    if (lastSceneIndex !== -1 && configIndex === lastSceneIndex) {
         return;
     }
 
-    lastWindow = currentWindow.windowClass;
+    lastSceneIndex = configIndex;
     pendingTransactions.push({ type: 'sceneRequest', sceneName: sceneInfo.targetScene });
     sock.send(
         JSON.stringify({

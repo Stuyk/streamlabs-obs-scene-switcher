@@ -10,7 +10,7 @@
     "author": "stuyk",
     "license": "ISC",
     "dependencies": {
-        "active-windows": "^0.1.12",
+        "active-windows": "^0.1.14",
         "chalk": "^4.1.0",
         "sockjs-client": "^1.4.0"
     },

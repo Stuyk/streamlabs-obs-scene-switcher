@@ -4,6 +4,12 @@
 	"scenes": [
 		{
 			"windowClassName": "Code.exe",
+			"windowName": { "name": "ide - project1", "contains": true },
+			"targetScene": "CodeScene"
+		},
+		{
+			"windowClassName": "Code.exe",
+			"windowName": { "name": "ide - project2", "contains": true },
 			"targetScene": "CodeScene"
 		},
 		{
