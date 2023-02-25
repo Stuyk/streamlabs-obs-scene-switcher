@@ -2,3 +2,4 @@ node_modules/*
 package-lock.json
 slobs-stream-switcher-*
 *.zip
+config.json
